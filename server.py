@@ -7,14 +7,31 @@ class TupleSpaceServer:
         self.ts_data = dict()
         self.ts_lock = threading.Lock()
         self.ts_state = {
-            "tuples_number": 0,
-            "ave_tuple_size": 0,
-            "ave_key_size": 0,
-            "ave_value_size": 0,
-            "clients_number": 0,
-            "op_number": 0,
-            "R_number": 0,
-            "G_number": 0,
-            "P_number": 0,
-            "error_number": 0
+            "tuples_number": 0, # number of tuples in the tuple space
+            "ave_tuple_size": 0, # average tuple size
+            "ave_key_size": 0, # average key size
+            "ave_value_size": 0, #  average value size
+            "clients_number": 0, # total number of clients which have connected
+            "op_number": 0, # total number of operations
+            "R_number": 0, # total number of READs
+            "G_number": 0, # total number of GETs
+            "P_number": 0, # total number of PUTs
+            "error_number": 0 # total number of errors
         }
+    
+    def update_states(self, op):
+        match op:
+            case "R":
+                self.ts_state["R_number"] += 1
+                self.ts_state["op_number"] += 1
+
+    def read(self, read_goal):
+        read_res = ""
+
+        with self.ts_lock:
+            if read_goal in self.ts_data:
+                read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
+            else:
+                read_res = f"ERR {read_goal} does not exist"
+            
+            self.update_states("R")
