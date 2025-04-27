@@ -24,7 +24,10 @@ class TupleSpaceServer:
             case "R":
                 self.ts_state["R_number"] += 1
                 self.ts_state["op_number"] += 1
-
+            case "G":
+                self.ts_data["G_number"] += 1
+                self.ts_data["op_number"] += 1
+                
     def read(self, read_goal):
         read_res = ""
 
@@ -35,3 +38,18 @@ class TupleSpaceServer:
                 read_res = f"ERR {read_goal} does not exist"
             
             self.update_states("R")
+
+        return read_res
+    
+    def get(self, get_goal):
+        get_res = ""
+
+        with self.ts_lock:
+            if get_goal in self.ts_data:
+                get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
+            else:
+                get_res = f"ERR {get_goal} does not exist"
+            
+            self.update_states("G")
+        
+        return get_res
