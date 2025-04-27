@@ -21,24 +21,40 @@ class TupleSpaceServer:
     
     def update_states(self, op):
         match op:
-            case "R":
+            case "Rt":
                 self.ts_state["R_number"] += 1
                 self.ts_state["op_number"] += 1
-            case "G":
+            case "Rf":
+                self.ts_state["error_number"] += 1
+                self.ts_state["R_number"] += 1
+                self.ts_state["op_number"] += 1
+            case "Gt":
                 self.ts_data["G_number"] += 1
                 self.ts_data["op_number"] += 1
-                
+            case "Gf":
+                self.ts_state["error_number"] += 1
+                self.ts_data["G_number"] += 1
+                self.ts_data["op_number"] += 1
+            case "Pt":
+                self.ts_state["P_number"] += 1
+                self.ts_state["op_number"] += 1
+                self.ts_data["tuples_number"] += 1
+            case "Pf":
+                self.ts_state["error_number"] += 1
+                self.ts_state["P_number"] += 1
+                self.ts_state["op_number"] += 1
+
     def read(self, read_goal):
         read_res = ""
 
         with self.ts_lock:
             if read_goal in self.ts_data:
                 read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
+                self.update_states("Rt")
             else:
                 read_res = f"ERR {read_goal} does not exist"
+                self.update_states("Rf")
             
-            self.update_states("R")
-
         return read_res
     
     def get(self, get_goal):
@@ -47,9 +63,25 @@ class TupleSpaceServer:
         with self.ts_lock:
             if get_goal in self.ts_data:
                 get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
+                self.update_states("Gt")
             else:
                 get_res = f"ERR {get_goal} does not exist"
-            
-            self.update_states("G")
-        
+                self.update_states("Gf")
+                
         return get_res
+    
+    def put(self, put_goal): # put_goal(tuple)
+        put_res = ""
+        put_goal_key = put_goal[0]
+        put_goal_value = put_goal[1]
+
+        with self.ts_lock:
+            if put_goal_key in self.ts_data:
+                put_res = f"ERR {put_goal_key} already exists"
+                self.update_states("Pf")
+            else:
+                self.ts_data[put_goal_key] = put_goal_value
+                put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_value]}) added"
+                self.update_states("Pt")
+            
+        return put_res
