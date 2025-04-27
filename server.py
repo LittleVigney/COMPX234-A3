@@ -67,7 +67,7 @@ class TupleSpaceServer:
             else:
                 get_res = f"ERR {get_goal} does not exist"
                 self.update_states("Gf")
-                
+
         return get_res
     
     def put(self, put_goal): # put_goal(tuple)
@@ -85,3 +85,17 @@ class TupleSpaceServer:
                 self.update_states("Pt")
             
         return put_res
+    
+    def cal_info(self):
+        sum_key_size = 0
+        sum_value_size = 0
+        sum_tuple_size = 0
+        for key, val in self.ts_state:
+            sum_key_size += len(key)
+            sum_value_size += len(val)
+            sum_tuple_size += len(key) + len(val)
+
+        self.ts_data["ave_key_size"] = sum_key_size / self.ts_data["tuples_number"]
+        self.ts_data["ave_value_size"] = sum_value_size / self.ts_data["tuples_number"]
+        self.ts_data["ave_tuple_size"] = sum_tuple_size / self.ts_data["tuples_number"]
+        
