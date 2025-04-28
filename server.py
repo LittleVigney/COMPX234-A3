@@ -158,3 +158,7 @@ def start_server(client_port):
 
     finally:
         pass
+
+if __name__ == "__main__":
+    start_server()
+    
