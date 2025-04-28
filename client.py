@@ -41,7 +41,7 @@ class TupleSpaceClient:
         f.close()
         
 
-def start_client(self, _filename, _port):
+def start_client(_filename, _port):
         my_client = TupleSpaceClient(_filename, _port)
 
         my_client.read_data()
