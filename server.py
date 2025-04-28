@@ -46,7 +46,6 @@ class TupleSpaceServer:
                 self.ts_state["op_number"] += 1
 
     def read(self, read_goal):
-
         with self.ts_lock:
             if read_goal in self.ts_data:
                 read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
@@ -58,7 +57,6 @@ class TupleSpaceServer:
         return read_res
     
     def get(self, get_goal):
-
         with self.ts_lock:
             if get_goal in self.ts_data:
                 get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
