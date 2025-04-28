@@ -143,10 +143,13 @@ def start_server(client_port):
                     rq_key = client_request[6 : ]
                     ans = my_tuplespace.read(rq_key)
                 elif rq_op == "G":
-                    pass
+                    rq_key = client_request[6 : ]
+                    ans = my_tuplespace.get(rq_key)
                 elif rq_op == "P":
-                    pass
-
+                    rq_key = client_request[6 : ]
+                    # rq_value = 
+                
+                client_socket.sendall(ans)
 
     finally:
         pass
