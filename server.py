@@ -99,3 +99,18 @@ class TupleSpaceServer:
         self.ts_data["ave_value_size"] = sum_value_size / self.ts_data["tuples_number"]
         self.ts_data["ave_tuple_size"] = sum_tuple_size / self.ts_data["tuples_number"]
         
+    def display_info(self):
+        time.sleep(10)
+
+        self.cal_info()
+
+        print(f"Number of tuples in the tuple space: {self.ts_data["tuples_number"]}")
+        print(f"Average tuple size: {self.ts_data["ave_tuple_size"]}")
+        print(f"Average key size: {self.ts_data["ave_key_size"]}")
+        print(f"Average value size: {self.ts_data["ave_value_size"]}")
+        print(f"Total number of clients: {self.ts_data["clients_number"]}")
+        print(f"Total number of operations: {self.ts_data["op_number"]}")
+        print(f"Total READs: {self.ts_data["R_number"]}")
+        print(f"Total GETs: {self.ts_data["G_number"]}")
+        print(f"Total PUTs: {self.ts_data["P_number"]}")
+        print(f"How many errors: {self.ts_data["error_number"]}")
