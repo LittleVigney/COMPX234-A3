@@ -129,7 +129,7 @@ def start_server(client_port):
 
             print(f"Client connected")
 
-            my_tuplespace.ts_data["clients_number"] += 1
+            my_tuplespace.ts_state["clients_number"] += 1
 
             while True:
                 client_request = client_socket.recv(1024).decode('utf-8')
@@ -139,7 +139,8 @@ def start_server(client_port):
                 # NNN G k
                 # NNN P k v
 
-                rq_size = int(client_request[0 : 3])
+                # rq_size = int(client_request[0 : 3])
+
                 rq_op = client_request[4]
                 
                 if rq_op == "R" or rq_op == "G":
@@ -151,8 +152,10 @@ def start_server(client_port):
                     rq_key = rq[1]
                     rq_value = rq[2]
                     ans = my_tuplespace.put((rq_key, rq_value))
-                
-                client_socket.sendall(ans)
+                else:
+                    ans = "error request"
+
+                client_socket.sendall(ans.encode())
 
     finally:
         pass

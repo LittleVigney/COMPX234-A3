@@ -1,0 +1,25 @@
+GET silvertip
+GET michel_montaigne
+PUT hard_liquor an alcoholic beverage that is distilled rather than fermented
+PUT al_aqabah Jordan's port; located in southwestern Jordan on the Gulf of Aqaba
+READ mulberry_tree
+PUT rewire provide with new wiring
+READ pervasive
+READ church_of_the_brethren
+READ 60_minutes
+PUT mince food chopped into small bits
+GET billow
+READ linkup
+READ rewire
+GET published
+GET hard_liquor
+PUT michel_montaigne French writer regarded as the originator of the modern essay (1533-1592)
+READ mulberry_tree
+GET western_ladies'_tresses
+GET impudent
+READ rhinencephalon
+READ absorbance
+GET grail
+PUT podargidae frogmouths
+READ hard_liquor
+GET homospory
