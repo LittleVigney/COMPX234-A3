@@ -38,10 +38,22 @@ class TupleSpaceClient:
             
             self.request_data.append(rq_info)
         
+        f.close()
+        
 
-def start_client(self):
-        self.read_data()
+def start_client(self, _filename, _port):
+        my_client = TupleSpaceClient(_filename, _port)
+
+        my_client.read_data()
+
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.client_socket.connect(self.socket_addr)   
 
+        for every_rq in my_client.request_data:
+            client_socket.send(every_rq.encode())
 
+            res = client_socket.recv(4096)
+
+            print(every_rq + " " + res.decode('utf-8'))
+            
