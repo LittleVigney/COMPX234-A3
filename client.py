@@ -56,4 +56,9 @@ def start_client(self, _filename, _port):
             res = client_socket.recv(4096)
 
             print(every_rq + " " + res.decode('utf-8'))
-            
+
+if __name__ == "__main__":
+    for i in range(1, 11):
+        filename = "client_" + str(i) + ".txt"
+
+        start_client(filename, 51234)

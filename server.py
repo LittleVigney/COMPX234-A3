@@ -6,6 +6,7 @@ class TupleSpaceServer:
     def __init__(self):
         self.ts_data = dict()
         self.ts_lock = threading.Lock()
+        self.server_port = 51234
         self.ts_state = {
             "tuples_number": 0, # number of tuples in the tuple space
             "ave_tuple_size": 0, # average tuple size
