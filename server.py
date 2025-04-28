@@ -114,3 +114,23 @@ class TupleSpaceServer:
         print(f"Total GETs: {self.ts_data["G_number"]}")
         print(f"Total PUTs: {self.ts_data["P_number"]}")
         print(f"How many errors: {self.ts_data["error_number"]}")
+
+def start_server(client_port):
+    my_tuplespace = TupleSpaceServer()
+
+    host = "localhost"
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    print("Tuple space server is running and waiting for connection.")
+
+    try:
+        while True:
+            server_socket.bind(host, client_port)
+
+            server_socket.listen(10)
+
+            client_socket, ip_addr = server_socket.accept()
+
+            print(f"Client connected")
+
+            
