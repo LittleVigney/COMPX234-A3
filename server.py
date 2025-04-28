@@ -45,7 +45,6 @@ class TupleSpaceServer:
                 self.ts_state["op_number"] += 1
 
     def read(self, read_goal):
-        read_res = ""
 
         with self.ts_lock:
             if read_goal in self.ts_data:
@@ -58,7 +57,6 @@ class TupleSpaceServer:
         return read_res
     
     def get(self, get_goal):
-        get_res = ""
 
         with self.ts_lock:
             if get_goal in self.ts_data:
@@ -71,7 +69,6 @@ class TupleSpaceServer:
         return get_res
     
     def put(self, put_goal): # put_goal(tuple)
-        put_res = ""
         put_goal_key = put_goal[0]
         put_goal_value = put_goal[1]
 
@@ -133,4 +130,23 @@ def start_server(client_port):
 
             print(f"Client connected")
 
-            
+            my_tuplespace.ts_data["clients_number"] += 1
+
+            while True:
+                client_request = client_socket.recv(1024).decode()
+
+                rq_size = int(client_request[0 : 3])
+                rq_op = client_request[4]
+                
+
+                if rq_op == "R":
+                    rq_key = client_request[6 : ]
+                    ans = my_tuplespace.read(rq_key)
+                elif rq_op == "G":
+                    pass
+                elif rq_op == "P":
+                    pass
+
+
+    finally:
+        pass
