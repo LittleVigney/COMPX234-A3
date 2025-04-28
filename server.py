@@ -135,6 +135,10 @@ def start_server(client_port):
             while True:
                 client_request = client_socket.recv(1024).decode()
 
+                # format of request from clients
+                # NNN R k
+                # NNN G k
+                # NNN P k v
                 rq_size = int(client_request[0 : 3])
                 rq_op = client_request[4]
                 
@@ -146,8 +150,10 @@ def start_server(client_port):
                     rq_key = client_request[6 : ]
                     ans = my_tuplespace.get(rq_key)
                 elif rq_op == "P":
-                    rq_key = client_request[6 : ]
-                    # rq_value = 
+                    rq = client_request.split()
+                    rq_key = rq[1]
+                    rq_value = rq[]
+                    ans = my_tuplespace.put((rq_key, rq_value))
                 
                 client_socket.sendall(ans)
 
