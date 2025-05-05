@@ -130,7 +130,9 @@ def handle_client(my_tuplespace, client_socket, addr):
             # rq_size = int(client_request[0 : 3])
 
             rq_op = client_request[4]
-                
+            
+            print("op is ", rq_op)
+
             if rq_op == "R" or rq_op == "G":
                 rqs = client_request.split(" ", 1)
                 rq_key = rqs[1]
@@ -168,6 +170,8 @@ def start_server(client_port):
             client_thread = threading.Thread(target=handle_client, args=(my_tuplespace, client_socket, addr))
 
             client_thread.start()
+    except KeyboardInterrupt:
+        print("Shut down the server.")
     finally:
         server_socket.close()
 

@@ -19,16 +19,16 @@ class TupleSpaceClient:
                 v = ""
                 lines = line.split()
 
-                # print("lines", lines)
+                # print("lines are", lines)
 
                 op = lines[0]
                 if op == "READ":
-                    k = line[5 : ]
+                    k = lines[1]
                 elif op == "GET":
-                    k = line[4 : ]
+                    k = lines[1]
                 elif op == "PUT":
                     k = lines[1]
-                    vbegin = len(k) + 4
+                    vbegin = len(k) + len("PUT") + 2
                     v = line[vbegin : ]
             
                 size_num = 7
@@ -39,11 +39,12 @@ class TupleSpaceClient:
             
                 # 如果请求长度大于999
 
-                rq_info = size + " " + k
+                rq_info = size + " " + op[0] + " " + k
                 if op == "PUT":
                     rq_info += " " + v
             
                 self.request_data.append(rq_info)
+                # print(rq_info)
         
 def start_client(_filename, _port):
         my_client = TupleSpaceClient(_filename, _port)
@@ -55,7 +56,7 @@ def start_client(_filename, _port):
         client_socket.connect(my_client.socket_addr)
 
         for every_rq in my_client.request_data:
-            client_socket.send(every_rq.encode('utf-8'))
+            client_socket.sendall(every_rq.encode('utf-8'))
 
             res = client_socket.recv(4096)
 
