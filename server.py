@@ -116,7 +116,7 @@ def handle_client(my_tuplespace, client_socket, addr):
 
     try:
         while True:
-            print(f"New request from client")
+            print(f"New request from client {addr}")
 
             client_request = client_socket.recv(1024).decode('utf-8')
 
@@ -125,11 +125,7 @@ def handle_client(my_tuplespace, client_socket, addr):
             # NNN G k
             # NNN P k v
 
-            # rq_size = int(client_request[0 : 3])
-
             rq_op = client_request[4]
-            
-            # print("op is ", rq_op)
 
             if rq_op == "R" or rq_op == "G":
                 rqs = client_request.split(" ", 2)

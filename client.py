@@ -74,12 +74,13 @@ if __name__ == "__main__":
     for i in range(1, 11):
         filename = "client_" + str(i) + ".txt"
         client_thread = threading.Thread(target=start_client, args=(filename, 51234))
-
+        client_thread.start()
+        
         my_clients.append(client_thread)
 
     for client in my_clients:
         client.join()
-        
+
     # filename = "test.txt"
 
     # start_client(filename, 51234)
