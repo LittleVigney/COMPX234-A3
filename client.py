@@ -4,6 +4,7 @@ import threading
 class TupleSpaceClient:
     def __init__(self, _filename, _port):
         self.request_data = list()
+        self.origin_data = list()
         self.port = _port
         self.filename = _filename
         self.socket_addr = ("localhost", self.port)
@@ -15,6 +16,8 @@ class TupleSpaceClient:
 
                 if not line:
                     break
+                
+                self.origin_data.append(line)
 
                 v = ""
                 lines = line.split()
@@ -55,12 +58,15 @@ def start_client(_filename, _port):
 
         client_socket.connect(my_client.socket_addr)
 
+        ct = 0
         for every_rq in my_client.request_data:
             client_socket.sendall(every_rq.encode('utf-8'))
 
             res = client_socket.recv(4096)
 
-            print(every_rq + " " + res.decode('utf-8'))
+            print(my_client.origin_data[ct] + " " + res.decode('utf-8'))
+
+            ct += 1
 
 if __name__ == "__main__":
     # for i in range(1, 2):

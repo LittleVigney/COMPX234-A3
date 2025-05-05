@@ -46,39 +46,37 @@ class TupleSpaceServer:
                 self.ts_state["op_number"] += 1
 
     def read(self, read_goal):
-        with self.ts_lock:
-            if read_goal in self.ts_data:
-                read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
-                self.update_states("Rt")
-            else:
-                read_res = f"ERR {read_goal} does not exist"
-                self.update_states("Rf")
+        if read_goal in self.ts_data:
+            read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
+            self.update_states("Rt")
+        else:
+            read_res = f"ERR {read_goal} does not exist"
+            self.update_states("Rf")
             
         return read_res
     
     def get(self, get_goal):
-        with self.ts_lock:
-            if get_goal in self.ts_data:
-                get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
-                self.update_states("Gt")
-            else:
-                get_res = f"ERR {get_goal} does not exist"
-                self.update_states("Gf")
+        if get_goal in self.ts_data:
+            get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
+            self.update_states("Gt")
+        else:
+            get_res = f"ERR {get_goal} does not exist"
+            self.update_states("Gf")
 
         return get_res
     
     def put(self, put_goal): # put_goal(tuple)
+        # print("put_goal is", put_goal)
         put_goal_key = put_goal[0]
         put_goal_value = put_goal[1]
 
-        with self.ts_lock:
-            if put_goal_key in self.ts_data:
-                put_res = f"ERR {put_goal_key} already exists"
-                self.update_states("Pf")
-            else:
-                self.ts_data[put_goal_key] = put_goal_value
-                put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_value]}) added"
-                self.update_states("Pt")
+        if put_goal_key in self.ts_data:
+            put_res = f"ERR {put_goal_key} already exists"
+            self.update_states("Pf")
+        else:
+            self.ts_data[put_goal_key] = put_goal_value
+            put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_value]}) added"
+            self.update_states("Pt")
             
         return put_res
     
@@ -131,16 +129,16 @@ def handle_client(my_tuplespace, client_socket, addr):
 
             rq_op = client_request[4]
             
-            print("op is ", rq_op)
+            # print("op is ", rq_op)
 
             if rq_op == "R" or rq_op == "G":
-                rqs = client_request.split(" ", 1)
-                rq_key = rqs[1]
+                rqs = client_request.split(" ", 2)
+                rq_key = rqs[2]
                 ans = my_tuplespace.read(rq_key)
             elif rq_op == "P":
-                rq = client_request.split(' ', 2)
-                rq_key = rq[1]
-                rq_value = rq[2]
+                rq = client_request.split(" ", 3)
+                rq_key = rq[2]
+                rq_value = rq[3]
                 ans = my_tuplespace.put((rq_key, rq_value))
             else:
                 ans = "error request"
