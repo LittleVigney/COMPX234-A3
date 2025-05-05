@@ -118,7 +118,7 @@ def handle_client(my_tuplespace, client_socket, addr):
 
     try:
         while True:
-            print(f"Client connected")
+            print(f"New request from client")
 
             client_request = client_socket.recv(1024).decode('utf-8')
 
