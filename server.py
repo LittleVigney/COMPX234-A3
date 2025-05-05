@@ -111,6 +111,44 @@ class TupleSpaceServer:
         print(f'Total PUTs: {self.ts_data["P_number"]}')
         print(f'How many errors: {self.ts_data["error_number"]}')
 
+def handle_client(my_tuplespace, client_socket, addr):
+    print(f"New client connecting.")
+
+    my_tuplespace.ts_state["clients_number"] += 1
+
+    try:
+        while True:
+            print(f"Client connected")
+
+            client_request = client_socket.recv(1024).decode('utf-8')
+
+            # format of request from clients
+            # NNN R k
+            # NNN G k
+            # NNN P k v
+
+            # rq_size = int(client_request[0 : 3])
+
+            rq_op = client_request[4]
+                
+            if rq_op == "R" or rq_op == "G":
+                rqs = client_request.split(" ", 1)
+                rq_key = rqs[1]
+                ans = my_tuplespace.read(rq_key)
+            elif rq_op == "P":
+                rq = client_request.split(' ', 2)
+                rq_key = rq[1]
+                rq_value = rq[2]
+                ans = my_tuplespace.put((rq_key, rq_value))
+            else:
+                ans = "error request"
+
+            client_socket.sendall(ans.encode())    
+
+    finally:
+        client_socket.close()
+        print("Client connection closed.")
+
 def start_server(client_port):
     my_tuplespace = TupleSpaceServer()
 
@@ -119,46 +157,19 @@ def start_server(client_port):
 
     print("Tuple space server is running and waiting for connection.")
 
+    server_socket.bind((host, client_port))
+
+    server_socket.listen(10)
+
     try:
         while True:
-            server_socket.bind((host, client_port))
+            client_socket, addr = server_socket.accept()
 
-            server_socket.listen(10)
+            client_thread = threading.Thread(target=handle_client, args=(my_tuplespace, client_socket, addr))
 
-            client_socket, ip_addr = server_socket.accept()
-
-            print(f"Client connected")
-
-            my_tuplespace.ts_state["clients_number"] += 1
-
-            while True:
-                client_request = client_socket.recv(1024).decode('utf-8')
-
-                # format of request from clients
-                # NNN R k
-                # NNN G k
-                # NNN P k v
-
-                # rq_size = int(client_request[0 : 3])
-
-                rq_op = client_request[4]
-                
-                if rq_op == "R" or rq_op == "G":
-                    rqs = client_request.split(" ", 1)
-                    rq_key = rqs[1]
-                    ans = my_tuplespace.read(rq_key)
-                elif rq_op == "P":
-                    rq = client_request.split(' ', 2)
-                    rq_key = rq[1]
-                    rq_value = rq[2]
-                    ans = my_tuplespace.put((rq_key, rq_value))
-                else:
-                    ans = "error request"
-
-                client_socket.sendall(ans.encode())
-
+            client_thread.start()
     finally:
-        pass
+        server_socket.close()
 
 if __name__ == "__main__":
     start_server(51234)
