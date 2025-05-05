@@ -72,6 +72,6 @@ if __name__ == "__main__":
     # for i in range(1, 2):
     #     filename = "client_" + str(i) + ".txt"
 
-    filename = "test.txt"
+    # filename = "test.txt"
 
-    start_client(filename, 51234)
+    # start_client(filename, 51234)

@@ -30,16 +30,16 @@ class TupleSpaceServer:
                 self.ts_state["R_number"] += 1
                 self.ts_state["op_number"] += 1
             case "Gt":
-                self.ts_data["G_number"] += 1
-                self.ts_data["op_number"] += 1
+                self.ts_state["G_number"] += 1
+                self.ts_state["op_number"] += 1
             case "Gf":
                 self.ts_state["error_number"] += 1
-                self.ts_data["G_number"] += 1
-                self.ts_data["op_number"] += 1
+                self.ts_state["G_number"] += 1
+                self.ts_state["op_number"] += 1
             case "Pt":
                 self.ts_state["P_number"] += 1
                 self.ts_state["op_number"] += 1
-                self.ts_data["tuples_number"] += 1
+                self.ts_state["tuples_number"] += 1
             case "Pf":
                 self.ts_state["error_number"] += 1
                 self.ts_state["P_number"] += 1
@@ -75,7 +75,7 @@ class TupleSpaceServer:
             self.update_states("Pf")
         else:
             self.ts_data[put_goal_key] = put_goal_value
-            put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_value]}) added"
+            put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_key]}) added"
             self.update_states("Pt")
             
         return put_res
