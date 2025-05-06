@@ -51,7 +51,7 @@ class TupleSpaceServer:
     def read(self, read_goal):
         # if k is in tuple space
         if read_goal in self.ts_data:
-            read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
+            read_res = f"OK ({read_goal}, {self.ts_data[read_goal]}) read"
             self.update_states("Rt") # update state
 
         # if k is not in tuple space
@@ -65,6 +65,7 @@ class TupleSpaceServer:
         # if k is in tuple space
         if get_goal in self.ts_data:
             get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
+            del self.ts_data[get_goal]
             self.update_states("Gt")
 
         # if k is not in tuple space
@@ -95,7 +96,7 @@ class TupleSpaceServer:
         sum_key_size = 0
         sum_value_size = 0
         sum_tuple_size = 0
-        for key, val in self.ts_data:
+        for key, val in self.ts_data.items:
             sum_key_size += len(key)
             sum_value_size += len(val)
             sum_tuple_size += len(key) + len(val)
@@ -106,7 +107,7 @@ class TupleSpaceServer:
         
     def display_info(self):
         while True:
-                # every 10 seconds
+            # every 10 seconds
             time.sleep(10)
 
             # before printing, update state
@@ -126,14 +127,14 @@ class TupleSpaceServer:
         
 
 def handle_client(my_tuplespace, client_socket, addr):
-    print(f"New client connecting.")
+    print(f"New client {addr} connecting.")
 
     # update client number of server state
     my_tuplespace.ts_state["clients_number"] += 1
 
     try:
         while True:
-            print(f"New request from client {addr}")
+            # print(f"New request from client {addr}")
 
             # receive request from client
             client_request = client_socket.recv(1024).decode('utf-8')

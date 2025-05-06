@@ -85,7 +85,7 @@ def start_client(_filename, _port):
 if __name__ == "__main__":
     my_clients = list()
 
-    for i in range(1, 11):
+    for i in range(1, 3):
         filename = "client_" + str(i) + ".txt"
         client_thread = threading.Thread(target=start_client, args=(filename, 51234))
         client_thread.start()
