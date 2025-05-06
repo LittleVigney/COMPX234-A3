@@ -177,6 +177,7 @@ def start_server(client_port):
 
     server_socket.listen(10)
 
+    print_state_thread = threading.Thread(target=my_tuplespace.display_info)
     try:
         while True:
             client_socket, addr = server_socket.accept()

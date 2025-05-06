@@ -54,6 +54,7 @@ class TupleSpaceClient:
                 self.request_data.append(rq_info)
         
 def start_client(_filename, _port):
+        # create a new client and connect with server
         my_client = TupleSpaceClient(_filename, _port)
 
         my_client.read_data()
@@ -62,6 +63,7 @@ def start_client(_filename, _port):
 
         client_socket.connect(my_client.socket_addr)
 
+        # send request to server
         ct = 0
         for every_rq in my_client.request_data:
             # if k and v is longer than 970, output an error message
@@ -92,7 +94,5 @@ if __name__ == "__main__":
 
     for client in my_clients:
         client.join()
-
-    # filename = "test.txt"
-
-    # start_client(filename, 51234)
+        
+    print("All tasks finished.")
