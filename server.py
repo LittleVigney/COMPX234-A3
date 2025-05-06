@@ -95,33 +95,35 @@ class TupleSpaceServer:
         sum_key_size = 0
         sum_value_size = 0
         sum_tuple_size = 0
-        for key, val in self.ts_state:
+        for key, val in self.ts_data:
             sum_key_size += len(key)
             sum_value_size += len(val)
             sum_tuple_size += len(key) + len(val)
 
-        self.ts_data["ave_key_size"] = sum_key_size / self.ts_data["tuples_number"]
-        self.ts_data["ave_value_size"] = sum_value_size / self.ts_data["tuples_number"]
-        self.ts_data["ave_tuple_size"] = sum_tuple_size / self.ts_data["tuples_number"]
+        self.ts_state["ave_key_size"] = sum_key_size / self.ts_state["tuples_number"]
+        self.ts_state["ave_value_size"] = sum_value_size / self.ts_state["tuples_number"]
+        self.ts_state["ave_tuple_size"] = sum_tuple_size / self.ts_state["tuples_number"]
         
     def display_info(self):
-        # every 10 seconds
-        time.sleep(10)
+        while True:
+                # every 10 seconds
+            time.sleep(10)
 
-        # before printing, update state
-        self.cal_info()
+            # before printing, update state
+            self.cal_info()
 
-        # print info of server
-        print(f'Number of tuples in the tuple space: { self.ts_data["tuples_number"] }') 
-        print(f'Average tuple size: {self.ts_data["ave_tuple_size"]}')
-        print(f'Average key size: {self.ts_data["ave_key_size"]}')
-        print(f'Average value size: {self.ts_data["ave_value_size"]}')
-        print(f'Total number of clients: {self.ts_data["clients_number"]}')
-        print(f'Total number of operations: {self.ts_data["op_number"]}')
-        print(f'Total READs: {self.ts_data["R_number"]}')
-        print(f'Total GETs: {self.ts_data["G_number"]}')
-        print(f'Total PUTs: {self.ts_data["P_number"]}')
-        print(f'How many errors: {self.ts_data["error_number"]}')
+            # print info of server
+            print(f'Number of tuples in the tuple space: {self.ts_state["tuples_number"] }') 
+            print(f'Average tuple size: {self.ts_state["ave_tuple_size"]}')
+            print(f'Average key size: {self.ts_state["ave_key_size"]}')
+            print(f'Average value size: {self.ts_state["ave_value_size"]}')
+            print(f'Total number of clients: {self.ts_state["clients_number"]}')
+            print(f'Total number of operations: {self.ts_state["op_number"]}')
+            print(f'Total READs: {self.ts_state["R_number"]}')
+            print(f'Total GETs: {self.ts_state["G_number"]}')
+            print(f'Total PUTs: {self.ts_state["P_number"]}')
+            print(f'How many errors: {self.ts_state["error_number"]}')
+        
 
 def handle_client(my_tuplespace, client_socket, addr):
     print(f"New client connecting.")
@@ -177,7 +179,10 @@ def start_server(client_port):
 
     server_socket.listen(10)
 
-    print_state_thread = threading.Thread(target=my_tuplespace.display_info)
+    # start thread which prints state of server
+    print_state_thread = threading.Thread(target=my_tuplespace.display_info, daemon=True)
+    print_state_thread.start()
+
     try:
         while True:
             client_socket, addr = server_socket.accept()
