@@ -3,10 +3,9 @@ import time
 import threading
 
 class TupleSpaceServer:
-    def __init__(self):
+    def __init__(self, port):
         self.ts_data = dict()
-        self.ts_lock = threading.Lock()
-        self.server_port = 51234
+        self.server_port = port
         self.ts_state = {
             "tuples_number": 0, # number of tuples in the tuple space
             "ave_tuple_size": 0, # average tuple size
@@ -21,6 +20,10 @@ class TupleSpaceServer:
         }
     
     def update_states(self, op):
+        # op = operation + result.
+        # Rt: R operation success. Rf: R operation fails.
+        # Gt: G operation success. Gf: G operation fails.
+        # Pt: P operation success. Pf: P operation fails.
         match op:
             case "Rt":
                 self.ts_state["R_number"] += 1
@@ -46,33 +49,41 @@ class TupleSpaceServer:
                 self.ts_state["op_number"] += 1
 
     def read(self, read_goal):
+        # if k is in tuple space
         if read_goal in self.ts_data:
             read_res = f"OK ({read_goal}, {self.ts_data[read_goal]} read)"
-            self.update_states("Rt")
+            self.update_states("Rt") # update state
+
+        # if k is not in tuple space
         else:
             read_res = f"ERR {read_goal} does not exist"
-            self.update_states("Rf")
+            self.update_states("Rf") # update state
             
         return read_res
     
     def get(self, get_goal):
+        # if k is in tuple space
         if get_goal in self.ts_data:
             get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
             self.update_states("Gt")
+
+        # if k is not in tuple space
         else:
             get_res = f"ERR {get_goal} does not exist"
             self.update_states("Gf")
 
         return get_res
     
-    def put(self, put_goal): # put_goal(tuple)
-        # print("put_goal is", put_goal)
+    def put(self, put_goal): # put_goal: tuple
         put_goal_key = put_goal[0]
         put_goal_value = put_goal[1]
 
+        # if k is in tuple space
         if put_goal_key in self.ts_data:
             put_res = f"ERR {put_goal_key} already exists"
             self.update_states("Pf")
+
+        # if k is not in tuple space
         else:
             self.ts_data[put_goal_key] = put_goal_value
             put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_key]}) added"
@@ -94,10 +105,13 @@ class TupleSpaceServer:
         self.ts_data["ave_tuple_size"] = sum_tuple_size / self.ts_data["tuples_number"]
         
     def display_info(self):
+        # every 10 seconds
         time.sleep(10)
 
+        # before printing, update state
         self.cal_info()
 
+        # print info of server
         print(f'Number of tuples in the tuple space: { self.ts_data["tuples_number"] }') 
         print(f'Average tuple size: {self.ts_data["ave_tuple_size"]}')
         print(f'Average key size: {self.ts_data["ave_key_size"]}')
@@ -112,12 +126,14 @@ class TupleSpaceServer:
 def handle_client(my_tuplespace, client_socket, addr):
     print(f"New client connecting.")
 
+    # update client number of server state
     my_tuplespace.ts_state["clients_number"] += 1
 
     try:
         while True:
             print(f"New request from client {addr}")
 
+            # receive request from client
             client_request = client_socket.recv(1024).decode('utf-8')
 
             # format of request from clients
@@ -127,6 +143,7 @@ def handle_client(my_tuplespace, client_socket, addr):
 
             rq_op = client_request[4]
 
+            # call corresponding method according to client's request
             if rq_op == "R" or rq_op == "G":
                 rqs = client_request.split(" ", 2)
                 rq_key = rqs[2]
@@ -139,14 +156,17 @@ def handle_client(my_tuplespace, client_socket, addr):
             else:
                 ans = "error request"
 
-            client_socket.sendall(ans.encode())    
+            # send reponse to client
+            client_socket.sendall(ans.encode())
 
     finally:
+        # finish one client's connection
         client_socket.close()
         print("Client connection closed.")
 
 def start_server(client_port):
-    my_tuplespace = TupleSpaceServer()
+    # create server and waiting for connection
+    my_tuplespace = TupleSpaceServer(client_port)
 
     host = "localhost"
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -161,12 +181,14 @@ def start_server(client_port):
         while True:
             client_socket, addr = server_socket.accept()
 
+            # start a new thread to handle one client
             client_thread = threading.Thread(target=handle_client, args=(my_tuplespace, client_socket, addr))
 
             client_thread.start()
     except KeyboardInterrupt:
         print("Shut down the server.")
     finally:
+        # close server
         server_socket.close()
 
 if __name__ == "__main__":

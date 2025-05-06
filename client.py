@@ -22,8 +22,6 @@ class TupleSpaceClient:
                 v = ""
                 lines = line.split()
 
-                # print("lines are", lines)
-
                 op = lines[0]
                 if op == "READ":
                     k = lines[1]
