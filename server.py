@@ -96,7 +96,7 @@ class TupleSpaceServer:
         sum_key_size = 0
         sum_value_size = 0
         sum_tuple_size = 0
-        for key, val in self.ts_data.items:
+        for key, val in self.ts_data.items():
             sum_key_size += len(key)
             sum_value_size += len(val)
             sum_tuple_size += len(key) + len(val)
@@ -114,6 +114,7 @@ class TupleSpaceServer:
             self.cal_info()
 
             # print info of server
+            print("----------------Server State-----------------------------------")
             print(f'Number of tuples in the tuple space: {self.ts_state["tuples_number"] }') 
             print(f'Average tuple size: {self.ts_state["ave_tuple_size"]}')
             print(f'Average key size: {self.ts_state["ave_key_size"]}')
@@ -139,6 +140,13 @@ def handle_client(my_tuplespace, client_socket, addr):
             # receive request from client
             client_request = client_socket.recv(1024).decode('utf-8')
 
+            if not client_request:
+                print("Client connection closed.")
+                break
+
+            if len(client_request) < 7 or len(client_request) > 999:
+                print("Invalid request")
+                continue
             # format of request from clients
             # NNN R k
             # NNN G k
