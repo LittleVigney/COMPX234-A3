@@ -51,15 +51,16 @@ class TupleSpaceServer:
                 self.ts_state["op_number"] += 1
 
     def read(self, read_goal):
-        # if k is in tuple space
-        if read_goal in self.ts_data:
-            read_res = f"OK ({read_goal}, {self.ts_data[read_goal]}) read"
-            self.update_states("Rt") # update state
+        with self.ts_lock:
+            # if k is in tuple space
+            if read_goal in self.ts_data:
+                read_res = f"OK ({read_goal}, {self.ts_data[read_goal]}) read"
+                self.update_states("Rt") # update state
 
-        # if k is not in tuple space
-        else:
-            read_res = f"ERR {read_goal} does not exist"
-            self.update_states("Rf") # update state
+            # if k is not in tuple space
+            else:
+                read_res = f"ERR {read_goal} does not exist"
+                self.update_states("Rf") # update state
             
         return read_res
     
