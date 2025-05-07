@@ -35,6 +35,7 @@ class TupleSpaceServer:
             case "Gt":
                 self.ts_state["G_number"] += 1
                 self.ts_state["op_number"] += 1
+                self.ts_state["tuples_number"] -= 1
             case "Gf":
                 self.ts_state["error_number"] += 1
                 self.ts_state["G_number"] += 1
@@ -202,9 +203,11 @@ def start_server(client_port):
             client_thread.start()
     except KeyboardInterrupt:
         print("Shut down the server.")
+        print_state_thread.join()
     finally:
         # close server
         server_socket.close()
+        print("Server is closed.")
 
 if __name__ == "__main__":
     start_server(51234)
