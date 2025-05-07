@@ -78,7 +78,7 @@ def start_client(_filename, _port):
             res = client_socket.recv(4096)
 
             # print result of request
-            print(my_client.origin_data[ct] + " " + res.decode('utf-8'))
+            print(my_client.origin_data[ct] + ": " + res.decode('utf-8'))
 
             ct += 1
 
