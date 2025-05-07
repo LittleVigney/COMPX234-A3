@@ -115,7 +115,7 @@ class TupleSpaceServer:
             self.cal_info()
 
             # print info of server
-            print("----------------Server State-----------------------------------")
+            print("------------------------Server State--------------------------------")
             print(f'Number of tuples in the tuple space: {self.ts_state["tuples_number"] }') 
             print(f'Average tuple size: {self.ts_state["ave_tuple_size"]}')
             print(f'Average key size: {self.ts_state["ave_key_size"]}')
