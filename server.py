@@ -18,6 +18,7 @@ class TupleSpaceServer:
             "P_number": 0, # total number of PUTs
             "error_number": 0 # total number of errors
         }
+        self.ts_lock = threading.Lock()
     
     def update_states(self, op):
         # op = operation + result.
@@ -63,33 +64,35 @@ class TupleSpaceServer:
         return read_res
     
     def get(self, get_goal):
-        # if k is in tuple space
-        if get_goal in self.ts_data:
-            get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
-            del self.ts_data[get_goal]
-            self.update_states("Gt")
+        with self.ts_lock:
+            # if k is in tuple space
+            if get_goal in self.ts_data:
+                get_res = f"OK ({get_goal}, {self.ts_data[get_goal]}) removed"
+                del self.ts_data[get_goal]
+                self.update_states("Gt")
 
-        # if k is not in tuple space
-        else:
-            get_res = f"ERR {get_goal} does not exist"
-            self.update_states("Gf")
+            # if k is not in tuple space
+            else:
+                get_res = f"ERR {get_goal} does not exist"
+                self.update_states("Gf")
 
         return get_res
     
     def put(self, put_goal): # put_goal: tuple
-        put_goal_key = put_goal[0]
-        put_goal_value = put_goal[1]
+        with self.ts_lock:
+            put_goal_key = put_goal[0]
+            put_goal_value = put_goal[1]
 
-        # if k is in tuple space
-        if put_goal_key in self.ts_data:
-            put_res = f"ERR {put_goal_key} already exists"
-            self.update_states("Pf")
+            # if k is in tuple space
+            if put_goal_key in self.ts_data:
+                put_res = f"ERR {put_goal_key} already exists"
+                self.update_states("Pf")
 
-        # if k is not in tuple space
-        else:
-            self.ts_data[put_goal_key] = put_goal_value
-            put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_key]}) added"
-            self.update_states("Pt")
+            # if k is not in tuple space
+            else:
+                self.ts_data[put_goal_key] = put_goal_value
+                put_res = f"OK ({put_goal_key}, {self.ts_data[put_goal_key]}) added"
+                self.update_states("Pt")
             
         return put_res
     
