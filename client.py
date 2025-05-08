@@ -77,6 +77,7 @@ def start_client(_filename, _port):
             # get response from server
             res = client_socket.recv(4096)
 
+            res = res[4 : ]
             # print result of request
             print(my_client.origin_data[ct] + ": " + res.decode('utf-8'))
 
@@ -85,7 +86,7 @@ def start_client(_filename, _port):
 if __name__ == "__main__":
     my_clients = list()
 
-    for i in range(1, 3):
+    for i in range(1, 11):
         filename = "client_" + str(i) + ".txt"
         client_thread = threading.Thread(target=start_client, args=(filename, 51234))
         client_thread.start()

@@ -98,17 +98,18 @@ class TupleSpaceServer:
         return put_res
     
     def cal_info(self):
-        sum_key_size = 0
-        sum_value_size = 0
-        sum_tuple_size = 0
-        for key, val in self.ts_data.items():
-            sum_key_size += len(key)
-            sum_value_size += len(val)
-            sum_tuple_size += len(key) + len(val)
+        with self.ts_lock:
+            sum_key_size = 0
+            sum_value_size = 0
+            sum_tuple_size = 0
+            for key, val in self.ts_data.items():
+                sum_key_size += len(key)
+                sum_value_size += len(val)
+                sum_tuple_size += len(key) + len(val)
 
-        self.ts_state["ave_key_size"] = sum_key_size / self.ts_state["tuples_number"]
-        self.ts_state["ave_value_size"] = sum_value_size / self.ts_state["tuples_number"]
-        self.ts_state["ave_tuple_size"] = sum_tuple_size / self.ts_state["tuples_number"]
+            self.ts_state["ave_key_size"] = sum_key_size / self.ts_state["tuples_number"]
+            self.ts_state["ave_value_size"] = sum_value_size / self.ts_state["tuples_number"]
+            self.ts_state["ave_tuple_size"] = sum_tuple_size / self.ts_state["tuples_number"]
         
     def display_info(self):
         while True:
@@ -163,7 +164,10 @@ def handle_client(my_tuplespace, client_socket, addr):
             if rq_op == "R" or rq_op == "G":
                 rqs = client_request.split(" ", 2)
                 rq_key = rqs[2]
-                ans = my_tuplespace.read(rq_key)
+                if rq_op == "R":
+                    ans = my_tuplespace.read(rq_key)
+                elif rq_op == "G":
+                    ans = my_tuplespace.get(rq_key)
             elif rq_op == "P":
                 rq = client_request.split(" ", 3)
                 rq_key = rq[2]
@@ -172,8 +176,12 @@ def handle_client(my_tuplespace, client_socket, addr):
             else:
                 ans = "error request"
 
+            ans_len = len(ans) + 4
+            ans_len_str = f"{ans_len:03d}"
+            ans = ans_len_str + " " + ans
+            
             # send reponse to client
-            client_socket.sendall(ans.encode())
+            client_socket.sendall(ans.encode('utf-8'))
 
     finally:
         # finish one client's connection
